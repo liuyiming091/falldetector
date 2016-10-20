@@ -27,7 +27,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingActivity" />
-        <activity android:name=".TestActivity"></activity>
+        <activity android:name=".TestActivity" />
+        <activity android:name=".NotificationActivity"></activity>
     </application>
 
 </manifest>
