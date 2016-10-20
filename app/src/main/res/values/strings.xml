@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">SensorMonitor</string>
+    <string-array name="p_array">
+        <item>Setting</item>
+        <item>大志</item>
+        <item>大志</item>
+        <item>大志</item>
+        <item>大志</item>
+        <item>大志</item>
+        <item>大志</item>
+    </string-array>
+    <string name="drawer_open">Sensor</string>
+    <string name="drawer_close">Sensor</string>
+    <string name="action_websearch">Web search</string>
+    <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string name="temperature">Temperature</string>
+    <string name="condition">Condition</string>
+    <string name="location">Location</string>
+    <string name="title_activity_settings">Settings</string>
+
+
+</resources>
