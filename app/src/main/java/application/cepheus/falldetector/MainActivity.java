@@ -155,12 +155,19 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
 
         if (position==0){
             Intent it=new Intent(this,SettingActivity.class);
+
             startActivity(it);
         }
         if (position==1){
-            Intent it=new Intent(this,TestActivity.class);
+            Intent it=new Intent(this,NotificationActivity.class);
             startActivity(it);
         }
+        if (position==2){
+            Intent it=new Intent(this,NochartActivity.class);
+            startActivity(it);
+        }
+        mDrawerLayout.closeDrawer(mDrawerList);
+
         // update selected item and title, then close the drawer
         /*mDrawerList.setItemChecked(position, true);
         setTitle(mPlanetTitles[position]);

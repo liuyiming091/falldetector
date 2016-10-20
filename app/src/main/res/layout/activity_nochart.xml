@@ -36,9 +36,9 @@
             android:layout_height="wrap_content"
             android:background="#000000"
             android:orientation="vertical"
-            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/quit"
             android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true">
+            android:layout_marginBottom="149dp">
 
             <com.romainpiel.shimmer.ShimmerTextView
                 android:id="@+id/title"
@@ -167,19 +167,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#000000"
-
-            android:orientation="vertical"
-            android:layout_below="@+id/linearLayout2"
-            android:layout_above="@+id/quit"
-            >
-
-
-        </LinearLayout>
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

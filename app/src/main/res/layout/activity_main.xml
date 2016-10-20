@@ -69,11 +69,7 @@
             android:textStyle="bold" />
 
     </RelativeLayout>
-    <RelativeLayout
-        android:id="@+id/menu_layout_left"
-        android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="left" >
+
 
     <ListView
     android:id="@+id/left_drawer2"
@@ -84,5 +80,5 @@
     android:divider="@android:color/transparent"
     android:dividerHeight="0dp"
     android:background="#111"/>
-    </RelativeLayout>
+
 </android.support.v4.widget.DrawerLayout>

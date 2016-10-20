@@ -1,6 +1,8 @@
 package application.cepheus.falldetector;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -13,12 +15,18 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
+import android.os.Vibrator;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,6 +53,9 @@ public class AccelActivity extends Activity {
 	TextView sumText;
 	TextView danWei ;
 	ShimmerTextView title;
+	private ImageButton button;
+	private Vibrator vibrator;
+
 	SensorEventListener threeParamListener;
 	SensorEventListener oneParamListener;
 	SensorEventListener twoParamListener;
@@ -78,6 +89,8 @@ public class AccelActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_accel);
+		button=(ImageButton)findViewById(R.id.quit);
+		button.setOnClickListener(ButtonListener);
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		avgHandler = new AveHandler();
 		db = DbUtils.create(getApplicationContext());
@@ -511,9 +524,27 @@ public class AccelActivity extends Activity {
 		} else if (cha > 2 * 9.8) {
 
 			sumText.setText("FALL!");
+			/*vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+			long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
+			vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设*/
+			Intent it=new Intent(AccelActivity.this,TestActivity.class);
+			startActivity(it);
+			/*KeyguardManager km= (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+			KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
+			//解锁
+			kl.disableKeyguard();
+			//获取电源管理器对象
+			PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);
+			//获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"bright");
+			//点亮屏幕
+			wl.acquire();*/
+
+
 		}
 	}
 
+	//Deal with the side menu
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// The action bar home/up action should open or close the drawer.
@@ -540,6 +571,16 @@ public class AccelActivity extends Activity {
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
-	//Deal with the side menu
+	public View.OnClickListener ButtonListener = new View.OnClickListener(){
+
+		@Override
+		public void onClick(View v) {
+			Intent it=new Intent(AccelActivity.this,MainActivity.class);
+			startActivity(it);
+			finish();
+		}
+	};
+
+
 
 }
