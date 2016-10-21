@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:allowBackup="true"
@@ -32,7 +33,8 @@
         <activity android:name=".SettingActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".NotificationActivity" />
-        <activity android:name=".NochartActivity"></activity>
+        <activity android:name=".NochartActivity" />
+        <activity android:name=".AlertActivity"></activity>
     </application>
 
 </manifest>
