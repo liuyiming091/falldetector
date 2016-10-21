@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@"
+        android:textColor="#f1c40f"
         android:id="@+id/textView9"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
