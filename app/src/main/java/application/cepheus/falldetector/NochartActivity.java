@@ -80,8 +80,8 @@ public class NochartActivity extends Activity {
     private GraphicalView chart;
     private XYMultipleSeriesRenderer renderer;
     private Context context;
-    private int yMax = 20;//y轴最大值，根据不同传感器变化
-    private int xMax = 50;//一屏显示测量次数
+    private int yMax = 20;
+    private int xMax = 50;
     private int yMin = 0;
     DbUtils db ;
 
@@ -118,7 +118,6 @@ public class NochartActivity extends Activity {
                 break;
         }
 
-        //初始化图表
         mTitle="Fall Detector";
         mPlanetTitles=getResources().getStringArray(R.array.p_array);
         mDrawerList=(ListView) findViewById(R.id.left_drawer);
@@ -137,36 +136,12 @@ public class NochartActivity extends Activity {
                 R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
                 R.string.drawer_open,  /* "open drawer" description for accessibility */
                 R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) ;/*{
-			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-			}
-
-			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mDrawerTitle);
-				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-			}
-		};*/
+        ) ;
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        //getActionBar().setTitle("fall");
 
 
     }
-	/*@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
 
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		// If the nav drawer is open, hide action items related to the content view
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-		menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
-		return super.onPrepareOptionsMenu(menu);
-	}*/
 
 
     @Override
@@ -181,9 +156,6 @@ public class NochartActivity extends Activity {
     //FButton fullScreen;
 
 
-    /**
-     * 抓取view中文本控件的函数
-     */
     private void findViews(){
         xText = (TextView) findViewById(R.id.xAxis);
         yText = (TextView) findViewById(R.id.yAxis);
@@ -196,12 +168,10 @@ public class NochartActivity extends Activity {
         shimmer.start(title);
     }
 
-    /**
-     * 初始化各类监听器
-     */
+
     private void initListeners() {
 
-        threeParamListener = new SensorEventListener() {//有三个返回参数的监听器
+        threeParamListener = new SensorEventListener() {
 
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -211,7 +181,7 @@ public class NochartActivity extends Activity {
                 zText.setText(event.values[2]+"");
                 double sum = threeDimenToOne(event.values[0], event.values[1], event.values[2]);
 
-                giveAverage(sum);//将当前测量的结果写入buffer，然后定期求buffer里面的平均值，并显示
+                giveAverage(sum);
                 ax=event.values[0];
                 ay=event.values[1];
                 az=event.values[2];
@@ -254,17 +224,14 @@ public class NochartActivity extends Activity {
     public static double threeDimenToOne(double x,double y,double z){
         return Math.sqrt(x*x+y*y+z*z);
     }
-    public  int index = 0;//指示这段时间一共写入了多少个数据
-    //在这里可以设置缓冲区的长度，用于求平均数
-    double[] buffer = new double[500];//半秒钟最多放500个数
+    public  int index = 0;
+    double[] buffer = new double[500];
     double[] diff=new double[501];
-    public int INTERVAL = 250;//每半秒求一次平均值
-    public double AVERAGE = 0;//存储平均值
+    public int INTERVAL = 250;
+    public double AVERAGE = 0;
 
 
-    /**
-     * 接受当前传感器的测量值，存到缓存区中去，并将下标加一
-     */
+
     public void giveAverage(double data){
         buffer[index]=data;
         index++;
@@ -305,23 +272,8 @@ public class NochartActivity extends Activity {
         } else if (cha > 2 * 9.8) {
 
             sumText.setText("FALL!");
-			/*vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-			long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
-			vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设*/
             Intent it=new Intent(NochartActivity.this,TestActivity.class);
             startActivity(it);
-			/*KeyguardManager km= (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-			KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
-			//解锁
-			kl.disableKeyguard();
-			//获取电源管理器对象
-			PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);
-			//获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
-			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"bright");
-			//点亮屏幕
-			wl.acquire();*/
-
-
         }
     }
 
