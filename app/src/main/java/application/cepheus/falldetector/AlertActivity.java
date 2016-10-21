@@ -12,7 +12,7 @@ import android.os.Vibrator;
 import android.widget.TextView;
 
 public class AlertActivity extends Activity {
-    private CountDownTimer time;
+    //private CountDownTimer time;
     SQLiteDatabase db;
     static final String db_name="Fall";
     static final String tb_name="detail";
@@ -20,22 +20,13 @@ public class AlertActivity extends Activity {
     PowerManager.WakeLock fullWakeLock;
     PowerManager.WakeLock partialWakeLock;
     private Vibrator vibrator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert);
         txv=(TextView)findViewById(R.id.textView9);
-        time = new CountDownTimer(100000,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                txv.setText((int) (millisUntilFinished/1000));
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        };
+        /**/
         /*txv=(TextView)findViewById(R.id.textView5);
         txv2=(TextView)findViewById(R.id.textView6);
         txv3=(TextView)findViewById(R.id.textView7);*/
@@ -49,13 +40,24 @@ public class AlertActivity extends Activity {
             txv2.setText(contact);
             txv3.setText(phone);*/
         }
-        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        /*vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
-        vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1
+        vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1*/
         createWakeLocks();
         wakeDevice();
         time.start();
     }
+    CountDownTimer time = new CountDownTimer(10000,1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
+            txv.setText(""+millisUntilFinished / 1000);
+        }
+
+        @Override
+        public void onFinish() {
+
+        }
+    };
     protected void createWakeLocks(){
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         fullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "Loneworker - FULL WAKE LOCK");

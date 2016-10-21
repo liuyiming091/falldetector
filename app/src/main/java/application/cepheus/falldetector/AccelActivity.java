@@ -74,14 +74,14 @@ public class AccelActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 
-	//图表相关
+	//graph related
 	 private XYSeries series;
 	 private XYMultipleSeriesDataset mDataset;
 	 private GraphicalView chart;
 	 private XYMultipleSeriesRenderer renderer;
 	 private Context context;
-	 private int yMax = 20;//y轴最大值，根据不同传感器变化
-	 private int xMax = 50;//一屏显示测量次数
+	 private int yMax = 20;
+	 private int xMax = 50;
 	 private int yMin = 0;
 	 DbUtils db ;
 
@@ -94,19 +94,17 @@ public class AccelActivity extends Activity {
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		avgHandler = new AveHandler();
 		db = DbUtils.create(getApplicationContext());
-		//给控件实例化
+
 		if(xText==null){
 			findViews();
 		}
 		Intent intent = getIntent();
 		int wtd = intent.getIntExtra("wtd", Sensor.TYPE_ACCELEROMETER);
-		avgThread = new Thread(runnable);//定期更新平均值的线程启动
+		avgThread = new Thread(runnable);//thread begins
 		avgThread.start();
 		intialize();
 
-
-		//初始化各个监听器
-       initListeners();
+        initListeners();
 
 		switch (wtd) {
 		case Sensor.TYPE_ACCELEROMETER:
@@ -121,7 +119,7 @@ public class AccelActivity extends Activity {
 			break;
 		}
 
-        //初始化图表
+        //initialize chart
         initChart("Times", danWei.getText().toString(),0,xMax,yMin,yMax);
 		mTitle="Fall Detector";
 		mPlanetTitles=getResources().getStringArray(R.array.p_array);
@@ -130,7 +128,6 @@ public class AccelActivity extends Activity {
 				R.layout.drawer_list_item, mPlanetTitles));
 		mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
 		// set a custom shadow that overlays the main content when the drawer opens
-
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 		//mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -153,25 +150,7 @@ public class AccelActivity extends Activity {
 			}
 		};*/
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		//getActionBar().setTitle("fall");
-
-
 	}
-	/*@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		// If the nav drawer is open, hide action items related to the content view
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-		menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
-		return super.onPrepareOptionsMenu(menu);
-	}*/
-
 
 	@Override
 	protected void onPause() {
@@ -182,11 +161,9 @@ public class AccelActivity extends Activity {
 	}
 	
 	Shimmer shimmer;
-	//FButton fullScreen;
 
-	
 	/**
-	 * 抓取view中文本控件的函数
+	 * findViewById
 	 */
 	private void findViews(){
 		xText = (TextView) findViewById(R.id.xAxis);
@@ -195,17 +172,14 @@ public class AccelActivity extends Activity {
 		sumText = (TextView) findViewById(R.id.sum);
 		danWei = (TextView) findViewById(R.id.danWei);
 		title = (ShimmerTextView) findViewById(R.id.title);
-		//fullScreen = (FButton) findViewById(R.id.bigImg);
 		shimmer = new Shimmer();
 		shimmer.start(title);
 	}
 	
-	/**
-	 * 初始化各类监听器
-	 */
+
 	private void initListeners() {
 
-			threeParamListener = new SensorEventListener() {//有三个返回参数的监听器
+			threeParamListener = new SensorEventListener() {
 				
 				@Override
 				public void onSensorChanged(SensorEvent event) {
@@ -215,23 +189,12 @@ public class AccelActivity extends Activity {
 					zText.setText(event.values[2]+""); 
 					double sum = threeDimenToOne(event.values[0], event.values[1], event.values[2]);
 						
-					giveAverage(sum);//将当前测量的结果写入buffer，然后定期求buffer里面的平均值，并显示
+					giveAverage(sum);
 					ax=event.values[0];
 					ay=event.values[1];
 					az=event.values[2];
 					AddData(ax,ay,az);
-					Fall(win);
-
-					
-					
-//					if(sum>24){
-//						 /* 
-//				         * 想设置震动大小可以通过改变pattern来设定，如果开启时间太短，震动效果可能感觉不到 
-//				         * */  
-//				        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);  
-//				        long [] pattern = {100,400};   // 停止 开启 停止 开启   
-//				        vibrator.vibrate(pattern,-1);           //重复两次上面的pattern 如果只想震动一次，index设为-1
-//					}
+					Fall(win);//fall detector
 				}
 				
 				
@@ -243,36 +206,28 @@ public class AccelActivity extends Activity {
 			};
 	}
 
-	/**
-	 * 初始化图表
-	 */
+
 	private void initChart(String xTitle, String yTitle, int minX, int maxX, int minY, int maxY){
-		//这里获得main界面上的布局，下面会把图表画在这个布局里面
         LinearLayout layout = (LinearLayout)findViewById(R.id.chart);
-        //这个类用来放置曲线上的所有点，是一个点的集合，根据这些点画出曲线
-        series = new XYSeries("历史曲线");
-        //创建一个数据集的实例，这个数据集将被用来创建图表
+        series = new XYSeries("history");
         mDataset = new XYMultipleSeriesDataset();
-        //将点集添加到这个数据集中
         mDataset.addSeries(series);
-        
-        //以下都是曲线的样式和属性等等的设置，renderer相当于一个用来给图表做渲染的句柄
+
         int lineColor = Color.GREEN;
         PointStyle style = PointStyle.CIRCLE;
         renderer = buildRenderer(lineColor, style, true);
-        
-      //设置好图表的样式
+
         setChartSettings(renderer, xTitle,yTitle, 
-        		minX, maxX, //x轴最小最大值
-        		minY, maxY, //y轴最小最大值
-        		Color.BLACK, //坐标轴颜色
-        		Color.WHITE//标签颜色
+        		minX, maxX,
+        		minY, maxY,
+        		Color.BLACK, //color of lines
+        		Color.WHITE//color of label
         );
        
-        //生成图表
+        //generate chart
         chart = ChartFactory.getLineChartView(this, mDataset, renderer);
         
-        //将图表添加到布局中去
+        //add chart to View
         layout.addView(chart, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 	}
 	
@@ -300,16 +255,16 @@ public class AccelActivity extends Activity {
 	public static double threeDimenToOne(double x,double y,double z){
 		return Math.sqrt(x*x+y*y+z*z);
 	}
-	public  int index = 0;//指示这段时间一共写入了多少个数据
-	//在这里可以设置缓冲区的长度，用于求平均数
-	double[] buffer = new double[500];//半秒钟最多放500个数
+	public  int index = 0;
+	//Buffer size
+	double[] buffer = new double[500];//500 in 0.5s
 	double[] diff=new double[501];
-	public int INTERVAL = 250;//每半秒求一次平均值
-	public double AVERAGE = 0;//存储平均值
+	public int INTERVAL = 250;
+	public double AVERAGE = 0;
 	
 	
 	/**
-	 * 一个子线程，没隔固定时间计算这段时间的平均值，并给textView赋值
+	 * a thread,calculate every fixed time
 	 */
 	Runnable runnable = new Runnable() {
 		
@@ -319,7 +274,7 @@ public class AccelActivity extends Activity {
 			System.out.println("Thread Begins!");
 			while(true){
 			try {
-				Thread.sleep(INTERVAL);//没隔固定时间求平均数
+				Thread.sleep(INTERVAL);//calculate the average
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();
@@ -330,51 +285,38 @@ public class AccelActivity extends Activity {
 			double sum = 0;
 			for (int i=0;i<index;i++) {
 				sum+=buffer[i];
-				//高精度加法
-//				sum = MathTools.add(sum, d);
 			}
 			AVERAGE = sum/new Double(index);
-			index=0;//让下标恢复
+			index=0;
 			}
 			avgHandler.sendEmptyMessage(1);
-			//高精度除法，还能四舍五入
-//			AVERAGE = MathTools.div(sum, buffer.length, 4);
+
 			}
 		}
 	};
-	
+
 	/**
-	 * 更新平均值的显示值
-	 */
-	/*public void setAverageView(){
-		if(sumText==null)return;
-		sumText.setText(AVERAGE+"");
-	}*/
-	/**
-	 * 每隔固定时间给平均值赋值，并且更新图表的操作
+	 * update the value and the chart
 	 *
 	 */
 	class AveHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
 
-			//setAverageView();//显示平均值
-			updateChart();//更新图表，非常重要的方法
-			//把当前值存入数据库
-			
+
+			updateChart();
+
 			Accelerate_info accelerate_info = new Accelerate_info(System.currentTimeMillis(), AVERAGE, sensor_id);
 			try {
-				db.save(accelerate_info);//将当前平均值存入数据库
+				db.save(accelerate_info);
 			} catch (DbException e) {
 
 				e.printStackTrace();
-				System.out.println("保存失败");
+				System.out.println("fail");
 			}
 		}
 	}
-	/**
-	 * 接受当前传感器的测量值，存到缓存区中去，并将下标加一
-	 */
+
 	public void giveAverage(double data){
 		buffer[index]=data;
 		index++;
@@ -384,7 +326,7 @@ public class AccelActivity extends Activity {
 	protected XYMultipleSeriesRenderer buildRenderer(int color, PointStyle style, boolean fill) {
 	     XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 	    
-	     //设置图表中曲线本身的样式，包括颜色、点的大小以及线的粗细等
+	     //set the chart view
 	     XYSeriesRenderer r = new XYSeriesRenderer();
 	     r.setColor(color);
 	     r.setPointStyle(style);
@@ -397,7 +339,6 @@ public class AccelActivity extends Activity {
 	
 	
 	/**
-	 * 初始化图表
 	 * @param renderer
 	 * @param xTitle
 	 * @param yTitle
@@ -410,11 +351,11 @@ public class AccelActivity extends Activity {
 	 */
 	  protected void setChartSettings(XYMultipleSeriesRenderer renderer, String xTitle, String yTitle,
 									  double xMin, double xMax, double yMin, double yMax, int axesColor, int labelsColor) {
-			     //有关对图表的渲染可参看api文档
-			     renderer.setChartTitle(title.getText().toString());//设置标题
+
+			     renderer.setChartTitle(title.getText().toString());//title
 			     renderer.setChartTitleTextSize(0);
-			     renderer.setXAxisMin(xMin);//设置x轴的起始点
-			     renderer.setXAxisMax(xMax);//设置一屏有多少个点
+			     renderer.setXAxisMin(xMin);//begin of X axis
+			     renderer.setXAxisMax(xMax);//how many points
 			     renderer.setYAxisMin(yMin);
 			     renderer.setYAxisMax(yMax);
 			     renderer.setBackgroundColor(Color.BLACK);
@@ -422,72 +363,51 @@ public class AccelActivity extends Activity {
 			     renderer.setAxesColor(axesColor);
 			     renderer.setLabelsColor(labelsColor);
 			     renderer.setShowGrid(true);
-			     renderer.setGridColor(Color.WHITE);//设置格子的颜色
-			     renderer.setXLabels(20);//没有什么卵用
-			     renderer.setYLabels(20);//把y轴刻度平均分成多少个
+			     renderer.setGridColor(Color.WHITE);
+			     renderer.setXLabels(20);
+			     renderer.setYLabels(20);
 			     renderer.setLabelsTextSize(0);
 			     renderer.setXTitle("");
 		         renderer.setYTitle("");
-		         //renderer.setXTitle(xTitle);//x轴的标题
-			     //renderer.setYTitle(yTitle);//y轴的标题
 			     renderer.setAxisTitleTextSize(30);
 			     renderer.setYLabelsAlign(Align.RIGHT);
 			     renderer.setPointSize((float) 2);
-			     renderer.setShowLegend(false);//说明文字
+			     renderer.setShowLegend(false);
 			     renderer.setLegendTextSize(20);
 			    }
 	  
-//		  int[] xv = new int[1000];//用来显示的数据
-//		  double[] yv = new double[1000];
+//
 		  private int addX = -1;
 		  private double addY = 0;
 		  /**
-		   * 更新图表的函数，其实就是重绘
+		   * update the chart
 		   */
 	    private void updateChart() {
 
-	        //设置好下一个需要增加的节点
 
-	        addY = AVERAGE;//需要增加的值
+	        addY = AVERAGE;
 
-	        //移除数据集中旧的点集
+
 	        mDataset.removeSeries(series);
 
-	        //判断当前点集中到底有多少点，因为屏幕总共只能容纳100个，所以当点数超过100时，长度永远是100
+
 	        int length = series.getItemCount();
-	        if (length > 5000) {//设置最多5000个数
+	        if (length > 5000) {//maximum 5000
 	         length = 5000;
 	        }
 
-	        //注释掉的文字为window资源管理器效果
 
-	     //将旧的点集中x和y的数值取出来放入backup中，并且将x的值加1，造成曲线向右平移的效果
-//	     for (int i = 0; i < length; i++) {
-//		     xv[i] = (int) series.getX(i) + 1;
-//		     yv[i] = (int) series.getY(i);
-//	     }
-
-	     //点集先清空，为了做成新的点集而准备
-//	     series.clear();
-
-	     //将新产生的点首先加入到点集中，然后在循环体中将坐标变换后的一系列点都重新加入到点集中
-	     //这里可以试验一下把顺序颠倒过来是什么效果，即先运行循环体，再添加新产生的点
-	     //每一个新点坐标都后移一位
-	     series.add(addX++, addY);//最重要的一句话，以xy对的方式往里放值
-//	     for (int k = 0; k < length; k++) {
-//	         series.add(xv[k], yv[k]);//把之前的数据放进去
-//	     }
+	     series.add(addX++, addY);//IMPORTANT!!!!
 	     if(addX>xMax){
 	    	 renderer.setXAxisMin(addX-xMax);
 	    	 renderer.setXAxisMax(addX);
 	     }
 
 
-	     //重要：在数据集中添加新的点集
+	     //Add point
 	     mDataset.addSeries(series);
 
-	     //视图更新，没有这一步，曲线不会呈现动态
-	     //如果在非UI主线程中，需要调用postInvalidate()，具体参考api
+	     //update
 	     chart.invalidate();
 	    }
 	private void AddData(double ax2, double ay2, double az2){
@@ -524,22 +444,8 @@ public class AccelActivity extends Activity {
 		} else if (cha > 2 * 9.8) {
 
 			sumText.setText("FALL!");
-			/*vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-			long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
-			vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设*/
-			Intent it=new Intent(AccelActivity.this,TestActivity.class);
+			Intent it=new Intent(AccelActivity.this,AlertActivity.class);
 			startActivity(it);
-			/*KeyguardManager km= (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-			KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
-			//解锁
-			kl.disableKeyguard();
-			//获取电源管理器对象
-			PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);
-			//获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
-			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"bright");
-			//点亮屏幕
-			wl.acquire();*/
-
 
 		}
 	}
