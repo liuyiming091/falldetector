@@ -1,48 +1,78 @@
 package application.cepheus.falldetector;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.os.Vibrator;
+import android.support.v4.app.ActivityCompat;
+import android.telephony.SmsManager;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
-
-public class AlertActivity extends Activity {
+import android.widget.Toast;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+public class AlertActivity extends Activity
+        implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener{
     //private CountDownTimer time;
     SQLiteDatabase db;
     static final String db_name="Fall";
     static final String tb_name="detail";
-    TextView txv;
+    private TextView txv;
+    private ImageButton yes,no;
     PowerManager.WakeLock fullWakeLock;
     PowerManager.WakeLock partialWakeLock;
     private Vibrator vibrator;
+    String name,contact,phone;
+    //location
+    private Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    //Number to store the current location with latitude and longitude
+    private double currentLatitude;
+    private double currentLongitude;
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+    //Explicitly get the permission of using location
+    private static final int REQUEST_ACCESS_FINE_LOCATION = 605;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert);
         txv=(TextView)findViewById(R.id.textView9);
-        /**/
-        /*txv=(TextView)findViewById(R.id.textView5);
-        txv2=(TextView)findViewById(R.id.textView6);
-        txv3=(TextView)findViewById(R.id.textView7);*/
+        yes=(ImageButton)findViewById(R.id.yes);
+        no=(ImageButton)findViewById(R.id.no);
+        yes.setOnClickListener(listener1);
+        no.setOnClickListener(listener2);
         db=openOrCreateDatabase(db_name, Context.MODE_PRIVATE,null);
         Cursor c=db.rawQuery("SELECT * FROM "+tb_name,null);
         if(c.moveToFirst()){
-            String name=c.getString(0);
-            String contact=c.getString(1);
-            String phone=c.getString(2);
-            /*txv.setText(name);
-            txv2.setText(contact);
-            txv3.setText(phone);*/
+            name=c.getString(0);
+            contact=c.getString(1);
+            phone=c.getString(2);
         }
-        /*vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        if (checkPlayServices()) {
+
+            // If google services can be used, build the GoogleApi client
+            buildGoogleApiClient();
+        }
+        //Get the current location
+        getCurrentLocation();
+        vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
-        vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1*/
+        vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1
         createWakeLocks();
         wakeDevice();
         time.start();
@@ -55,7 +85,16 @@ public class AlertActivity extends Activity {
 
         @Override
         public void onFinish() {
-
+            String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
+            String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+            smsManager.sendTextMessage(phone, null, text_Message, null, null);
+            vibrator.cancel();
+            Intent it=new Intent(AlertActivity.this,MainActivity.class);
+            startActivity(it);
+            finish();
+            Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();
         }
     };
     protected void createWakeLocks(){
@@ -79,6 +118,7 @@ public class AlertActivity extends Activity {
         if(partialWakeLock.isHeld()){
             partialWakeLock.release();
         }
+        checkPlayServices();
     }
 
     // Called whenever we need to wake up the device
@@ -88,6 +128,99 @@ public class AlertActivity extends Activity {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
         keyguardLock.disableKeyguard();
+    }
+
+    public View.OnClickListener listener1=new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            vibrator.cancel();
+            Intent it=new Intent(AlertActivity.this,MainActivity.class);
+            startActivity(it);
+            finish();
+            Toast.makeText(AlertActivity.this,"Alert has been canceled!",Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    public View.OnClickListener listener2=new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
+            String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+            smsManager.sendTextMessage(phone, null, text_Message, null, null);
+            vibrator.cancel();
+            Intent it=new Intent(AlertActivity.this,MainActivity.class);
+            startActivity(it);
+            finish();
+            Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();
+
+        }
+    };
+
+    //Check if the google play services are available on this phone
+    private boolean checkPlayServices() {
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        int result = googleAPI.isGooglePlayServicesAvailable(this);
+        if(result != ConnectionResult.SUCCESS) {
+            if(googleAPI.isUserResolvableError(result)) {
+                googleAPI.getErrorDialog(this, result,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+    //Build the google api client to get the location
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+    private void getCurrentLocation() {
+
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            //Get the permission of the location
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ACCESS_FINE_LOCATION );
+        }
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            currentLatitude = mLastLocation.getLatitude();
+            currentLongitude = mLastLocation.getLongitude();
+        }
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
+                + result.getErrorCode());
+    }
+
+    @Override
+    public void onConnected(Bundle arg0) {
+
+        // Once connected with google api, get the location
+        getCurrentLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int arg0) {
+        mGoogleApiClient.connect();
     }
 }
 

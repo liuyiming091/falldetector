@@ -105,6 +105,7 @@ public class SettingActivity extends Activity {
             db.close();
             Intent it= new Intent(SettingActivity.this,MainActivity.class);
             startActivity(it);
+            finish();
         }
     };
     @Override

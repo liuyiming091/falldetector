@@ -90,8 +90,10 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
 
     }
     public void gotoSensorActivity(View v){
-        Intent it= new Intent(this,AccelActivity.class);
+        //Intent it= new Intent(this,AccelActivity.class);
+        Intent it=new Intent(this,AccelActivity.class);
         startActivity(it);
+        finish();
     }
 
     //YahooWeather Service

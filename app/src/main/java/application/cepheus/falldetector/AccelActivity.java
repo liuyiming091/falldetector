@@ -446,6 +446,7 @@ public class AccelActivity extends Activity {
 			sumText.setText("FALL!");
 			Intent it=new Intent(AccelActivity.this,AlertActivity.class);
 			startActivity(it);
+			finish();
 
 		}
 	}
