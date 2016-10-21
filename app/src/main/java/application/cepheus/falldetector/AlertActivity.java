@@ -54,8 +54,6 @@ public class AlertActivity extends Activity
         txv=(TextView)findViewById(R.id.textView9);
         yes=(ImageButton)findViewById(R.id.yes);
         no=(ImageButton)findViewById(R.id.no);
-        yes.setOnClickListener(listener1);
-        no.setOnClickListener(listener2);
         db=openOrCreateDatabase(db_name, Context.MODE_PRIVATE,null);
         Cursor c=db.rawQuery("SELECT * FROM "+tb_name,null);
         if(c.moveToFirst()){
@@ -70,6 +68,8 @@ public class AlertActivity extends Activity
         }
         //Get the current location
         getCurrentLocation();
+        yes.setOnClickListener(listener1);
+        no.setOnClickListener(listener2);
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
         vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1
@@ -181,6 +181,7 @@ public class AlertActivity extends Activity
                 .addApi(LocationServices.API)
                 .build();
     }
+
     private void getCurrentLocation() {
 
         int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
