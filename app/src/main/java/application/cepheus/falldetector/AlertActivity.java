@@ -147,6 +147,7 @@ public class AlertActivity extends Activity
     public View.OnClickListener listener2=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            finish();
             time.cancel();
             String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
             String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
@@ -156,7 +157,7 @@ public class AlertActivity extends Activity
             vibrator.cancel();
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
-            finish();
+            //finish();
             Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();
 
         }
