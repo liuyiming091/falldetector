@@ -80,16 +80,18 @@ public class AlertActivity extends Activity
     CountDownTimer time = new CountDownTimer(10000,1000) {
         @Override
         public void onTick(long millisUntilFinished) {
+
             txv.setText(""+millisUntilFinished / 1000);
         }
 
         @Override
         public void onFinish() {
+            time.cancel();
             String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
             String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone, null, text_Message2, null, null);
-            smsManager.sendTextMessage(phone, null, text_Message, null, null);
+            //SmsManager smsManager = SmsManager.getDefault();
+            //smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+            //smsManager.sendTextMessage(phone, null, text_Message, null, null);
             vibrator.cancel();
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
@@ -133,6 +135,7 @@ public class AlertActivity extends Activity
     public View.OnClickListener listener1=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            time.cancel();
             vibrator.cancel();
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
@@ -144,11 +147,12 @@ public class AlertActivity extends Activity
     public View.OnClickListener listener2=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            time.cancel();
             String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
             String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phone, null, text_Message2, null, null);
-            smsManager.sendTextMessage(phone, null, text_Message, null, null);
+           // SmsManager smsManager = SmsManager.getDefault();
+            //smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+            //smsManager.sendTextMessage(phone, null, text_Message, null, null);
             vibrator.cancel();
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
