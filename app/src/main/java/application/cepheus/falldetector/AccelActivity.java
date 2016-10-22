@@ -442,12 +442,10 @@ public class AccelActivity extends Activity {
 			tmin = 0;
 			tmax = 0;
 		} else if (cha > 2 * 9.8) {
-
 			sumText.setText("FALL!");
 			Intent it=new Intent(AccelActivity.this,AlertActivity.class);
 			startActivity(it);
 			finish();
-
 		}
 	}
 

@@ -75,18 +75,20 @@ public class AlertActivity extends Activity
         vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1
         createWakeLocks();
         wakeDevice();
-        time.start();
+       // time.start();
     }
     CountDownTimer time = new CountDownTimer(10000,1000) {
         @Override
         public void onTick(long millisUntilFinished) {
 
             txv.setText(""+millisUntilFinished / 1000);
+
         }
 
         @Override
         public void onFinish() {
-            time.cancel();
+           vibrator.cancel();
+            /* time.cancel();
             String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
             String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
             //SmsManager smsManager = SmsManager.getDefault();
@@ -95,8 +97,8 @@ public class AlertActivity extends Activity
             vibrator.cancel();
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
-            finish();
-            Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();
+            AlertActivity.this.finish();
+            Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();*/
         }
     };
     protected void createWakeLocks(){
@@ -135,6 +137,7 @@ public class AlertActivity extends Activity
     public View.OnClickListener listener1=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            db.close();
             time.cancel();
             vibrator.cancel();
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
@@ -147,6 +150,7 @@ public class AlertActivity extends Activity
     public View.OnClickListener listener2=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            db.close();
             time.cancel();
             //String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
             //String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
