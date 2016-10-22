@@ -18,10 +18,10 @@
         <TextView
             android:text="Here are some tips:"
             android:layout_width="wrap_content"
+            android:textColor="#FFFFFF"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:id="@+id/textView3"
-            android:textColor="#FFFFFF"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true" />
 
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="#FFFFFF"
-            android:text="@string/tips"
+            android:text="@string/aid"
             android:layout_below="@+id/textView3"
             android:layout_alignParentEnd="true"
             android:textStyle="bold" />

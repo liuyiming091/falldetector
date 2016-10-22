@@ -3,11 +3,9 @@
     <string-array name="p_array">
         <item>Setting</item>
         <item>Tips</item>
-        <item>大志</item>
-        <item>大志</item>
-        <item>大志</item>
-        <item>大志</item>
-        <item>大志</item>
+        <item>Aids</item>
+        <item>Quit</item>
+
     </string-array>
     <string name="drawer_open">Sensor</string>
     <string name="drawer_close">Sensor</string>
@@ -24,6 +22,11 @@
 (4)	Pay attention to the allergy. If the elderly has any allergic history, they should to try to avoid a place to spend, but also prior to oral Parker Min and other anti-allergic drugs to prevent pollen allergy.
 (5)	Anti-motion sickness. Motion sickness, seasickness, motion sickness is the most common motion sickness, fasting, satiety, fatigue and lack of sleep are common incentives to pay attention to avoid. Mild motion sickness, eyes closed or rest can be eliminated after bed rest.
         "</string>
+    <string name="aid">"
+(1)	The pedestrian should not rush to move or lift the elderly and check the falling condition such as breath rate, heart rate, mind and so on.
+(2)	If it is only soft tissue injury, do not rush to rub the site of injury, rubbing, pressure or heat, etc. All this above would increase the bleeding or swelling.
+(3)	If the fall elderly is consciousness, you can ask him/her if there is any special pain; if there are parts of special pain, then it is would be a fracture. At this time, you should not move or propped up the elderly, because the more moving the more easily dislocation fracture, fracture surface is easy to stab the blood vessels, nerves and make the worse condition.
+    "</string>
 
 
 </resources>

@@ -47,26 +47,27 @@
         android:layout_below="@+id/conditionTextView"
         android:layout_centerHorizontal="true" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageButton"
-        android:src="@drawable/start"
-        android:background="#00000000"
-        android:onClick="gotoSensorActivity"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
-        <TextView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Press the Pokeman Ball!"
-            android:id="@+id/textView"
-            android:layout_above="@+id/imageButton"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="40dp"
-            android:textStyle="bold" />
+            android:id="@+id/imageButton2"
+            android:src="@drawable/start1"
+            android:onClick="on1"
+            android:background="#00000000"
+            android:layout_marginBottom="82dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@+id/conditionTextView" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton3"
+            android:src="@drawable/start2"
+            android:onClick="on2"
+            android:background="#00000000"
+
+            android:layout_alignTop="@+id/imageButton2"
+            android:layout_toEndOf="@+id/conditionTextView" />
 
     </RelativeLayout>
 

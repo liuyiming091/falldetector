@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
         service = new  YahooWeatherService(this);
         dialog = new ProgressDialog(this);
         dialog.setMessage("Loading...");
-        dialog.show();
+        //dialog.show();
         service.refreshWeather("Sydney,Australia");
         //SQLite
         db=openOrCreateDatabase(db_name, Context.MODE_PRIVATE,null);
@@ -117,12 +117,46 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
         }
         else {
             //Intent it= new Intent(this,AccelActivity.class);
+            finish();
             Intent it = new Intent(this, AccelActivity.class);
             startActivity(it);
-            finish();
+
             db.close();
         }
     }
+    public void on1(View v){
+        cursor=db.rawQuery("SELECT * FROM "+tb_name,null);
+        int name = cursor.getCount();
+        if(name==0)
+        {
+            Toast.makeText(MainActivity.this,"Please enter the contacter first!",Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //Intent it= new Intent(this,AccelActivity.class);
+            finish();
+            Intent it = new Intent(this, AccelActivity.class);
+            startActivity(it);
+
+            db.close();
+        }
+    }
+    public void on2(View v){
+        cursor=db.rawQuery("SELECT * FROM "+tb_name,null);
+        int name = cursor.getCount();
+        if(name==0)
+        {
+            Toast.makeText(MainActivity.this,"Please enter the contacter first!",Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //Intent it= new Intent(this,AccelActivity.class);
+            finish();
+            Intent it = new Intent(this, NochartActivity.class);
+            startActivity(it);
+            db.close();
+        }
+    }
+
+
 
     //YahooWeather Service
     @Override
@@ -193,8 +227,11 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
             startActivity(it);
         }
         if (position==2){
-            Intent it=new Intent(this,NochartActivity.class);
+            Intent it=new Intent(this,AidActivity.class);
             startActivity(it);
+        }
+        if(position==3){
+            finish();
         }
         mDrawerLayout.closeDrawer(mDrawerList);
 

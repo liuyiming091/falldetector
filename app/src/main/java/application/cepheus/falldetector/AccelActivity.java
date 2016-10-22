@@ -1,11 +1,8 @@
 package application.cepheus.falldetector;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.hardware.Sensor;
@@ -15,21 +12,19 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.exception.DbException;
@@ -44,6 +39,9 @@ import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class AccelActivity extends Activity {
 	public SensorManager sensorManager;
 	public Sensor accelSensor ;
@@ -54,7 +52,7 @@ public class AccelActivity extends Activity {
 	TextView danWei ;
 	ShimmerTextView title;
 	private ImageButton button;
-	private Vibrator vibrator;
+	//private Vibrator vibrator;
 
 	SensorEventListener threeParamListener;
 	SensorEventListener oneParamListener;
@@ -94,15 +92,17 @@ public class AccelActivity extends Activity {
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		avgHandler = new AveHandler();
 		db = DbUtils.create(getApplicationContext());
-
+        intialize();
 		if(xText==null){
 			findViews();
 		}
+        //sumText.setText("normal ");
 		Intent intent = getIntent();
 		int wtd = intent.getIntExtra("wtd", Sensor.TYPE_ACCELEROMETER);
+
 		avgThread = new Thread(runnable);//thread begins
 		avgThread.start();
-		intialize();
+
 
         initListeners();
 
@@ -121,38 +121,24 @@ public class AccelActivity extends Activity {
 
         //initialize chart
         initChart("Times", danWei.getText().toString(),0,xMax,yMin,yMax);
-		mTitle="Fall Detector";
+		/*mTitle="Fall Detector";
 		mPlanetTitles=getResources().getStringArray(R.array.p_array);
 		mDrawerList=(ListView) findViewById(R.id.left_drawer);
 		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.drawer_list_item, mPlanetTitles));
-		mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
-		// set a custom shadow that overlays the main content when the drawer opens
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-		//mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+				R.layout.drawer_list_item, mPlanetTitles));*/
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
-		mDrawerToggle = new ActionBarDrawerToggle(
-				this,                  /* host Activity */
-				mDrawerLayout,         /* DrawerLayout object */
-				R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-				R.string.drawer_open,  /* "open drawer" description for accessibility */
-				R.string.drawer_close  /* "close drawer" description for accessibility */
-		) ;/*{
-			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
-				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-			}
 
-			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mDrawerTitle);
-				invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-			}
-		};*/
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
-	@Override
+    private void intialize(){
+        for(int i=1;i<500;i++)
+            diff[i]=0;
+        for(int i=0;i<500;i++)
+            win[i]=0;
+    }
+
+    @Override
 	protected void onPause() {
 
 		super.onPause();
@@ -175,6 +161,7 @@ public class AccelActivity extends Activity {
 		shimmer = new Shimmer();
 		shimmer.start(title);
 	}
+
 	
 
 	private void initListeners() {
@@ -188,11 +175,26 @@ public class AccelActivity extends Activity {
 					yText.setText(event.values[1]+""); 
 					zText.setText(event.values[2]+""); 
 					double sum = threeDimenToOne(event.values[0], event.values[1], event.values[2]);
-						
 					giveAverage(sum);
 					ax=event.values[0];
 					ay=event.values[1];
 					az=event.values[2];
+                    sumText.setText("initiating...");
+
+                    /*new Thread(){
+                        public void run(){
+                            try {
+                                sleep(3000);
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            finally{
+                                AddData(ax,ay,az);
+                                Fall(win);//fall detector
+                            }
+                        }
+                    }.start();*/
 					AddData(ax,ay,az);
 					Fall(win);//fall detector
 				}
@@ -246,7 +248,6 @@ public class AccelActivity extends Activity {
 		}
 		if(avgThread!=null)
 		avgThread.interrupt();
-		
 
 		
 	}
@@ -306,14 +307,14 @@ public class AccelActivity extends Activity {
 
 			updateChart();
 
-			Accelerate_info accelerate_info = new Accelerate_info(System.currentTimeMillis(), AVERAGE, sensor_id);
+			/*Accelerate_info accelerate_info = new Accelerate_info(System.currentTimeMillis(), AVERAGE, sensor_id);
 			try {
 				db.save(accelerate_info);
 			} catch (DbException e) {
 
 				e.printStackTrace();
 				System.out.println("fail");
-			}
+			}*/
 		}
 	}
 
@@ -383,20 +384,12 @@ public class AccelActivity extends Activity {
 		   * update the chart
 		   */
 	    private void updateChart() {
-
-
 	        addY = AVERAGE;
-
-
 	        mDataset.removeSeries(series);
-
-
 	        int length = series.getItemCount();
 	        if (length > 5000) {//maximum 5000
 	         length = 5000;
 	        }
-
-
 	     series.add(addX++, addY);//IMPORTANT!!!!
 	     if(addX>xMax){
 	    	 renderer.setXAxisMin(addX-xMax);
@@ -410,19 +403,31 @@ public class AccelActivity extends Activity {
 	     //update
 	     chart.invalidate();
 	    }
-	private void AddData(double ax2, double ay2, double az2){
-		a_norm= Math.sqrt(ax2*ax2+ay2*ay2+az2*az2);
-		for(i=0;i<=500-2;i++){
-			win[i]=win[i+1];
-		}
-		win[500-1]=a_norm;
+	private void AddData(final double ax2,final double ay2,final double az2){
+        TimerTask task = new TimerTask(){
+
+            public void run(){
+                a_norm= Math.sqrt(ax2*ax2+ay2*ay2+az2*az2);
+                for(i=0;i<=500-2;i++){
+                    win[i]=win[i+1];
+                }
+                win[500-1]=a_norm;//execute the task
+
+            }
+
+        };
+
+        Timer timer = new Timer();
+
+        timer.schedule(task,100);
+
 	}
-	private void intialize(){
-		for(int i=0;i<501;i++)
-			diff[i]=0;
-	}
+
+
+    //fall detection algorithm
 	private void Fall(double[] window2) {
-		int tmax = 1;
+		sumText.setText("Working");
+        int tmax = 1;
 		int tmin = 1;
 		int i = 1;
 		diff[1] = window2[0];
@@ -443,39 +448,33 @@ public class AccelActivity extends Activity {
 			tmax = 0;
 		} else if (cha > 2 * 9.8) {
 			sumText.setText("FALL!");
-			Intent it=new Intent(AccelActivity.this,AlertActivity.class);
+            sensorManager.unregisterListener(threeParamListener);
+
+            this.finish();
+            Intent it=new Intent(AccelActivity.this,AlertActivity.class);
 			startActivity(it);
-			finish();
+
+
 		}
 	}
 
-	//Deal with the side menu
+	//actionbar back
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// The action bar home/up action should open or close the drawer.
 		// ActionBarDrawerToggle will take care of this.
-		if (mDrawerToggle.onOptionsItemSelected(item)) {
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Intent it=new Intent(this,MainActivity.class);
+                startActivity(it);
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 	}
 
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		// Sync the toggle state after onRestoreInstanceState has occurred.
-		mDrawerToggle.syncState();
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		// Pass any configuration change to the drawer toggls
-		mDrawerToggle.onConfigurationChanged(newConfig);
-	}
-
+    //quit button
 	public View.OnClickListener ButtonListener = new View.OnClickListener(){
 
 		@Override

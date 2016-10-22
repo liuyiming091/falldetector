@@ -96,9 +96,10 @@ public class SettingActivity extends Activity {
             cv.put("phone",phone);
             db.insert(tb_name,null,cv);
             db.close();
+            finish();
             Intent it= new Intent(SettingActivity.this,MainActivity.class);
             startActivity(it);
-            finish();
+
         }
     };
     @Override

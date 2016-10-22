@@ -44,6 +44,9 @@ import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class NochartActivity extends Activity {
     public SensorManager sensorManager;
     public Sensor accelSensor ;
@@ -88,8 +91,8 @@ public class NochartActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_accel);
-        button=(ImageButton)findViewById(R.id.quit);
+        setContentView(R.layout.activity_nochart);
+        button=(ImageButton)findViewById(R.id.quit2);
         button.setOnClickListener(ButtonListener);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         db = DbUtils.create(getApplicationContext());
@@ -108,7 +111,7 @@ public class NochartActivity extends Activity {
         switch (wtd) {
             case Sensor.TYPE_ACCELEROMETER:
                 title.setText("Fall Detector");
-                danWei.setText("");
+                //danWei.setText("");
                 accelSensor = sensorManager.getDefaultSensor(wtd);
                 sensorManager.registerListener(threeParamListener, accelSensor, sensorManager.SENSOR_DELAY_UI);
                 yMax = 20;
@@ -120,26 +123,16 @@ public class NochartActivity extends Activity {
 
         mTitle="Fall Detector";
         mPlanetTitles=getResources().getStringArray(R.array.p_array);
-        mDrawerList=(ListView) findViewById(R.id.left_drawer);
+        mDrawerList=(ListView) findViewById(R.id.left_drawer5);
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, mPlanetTitles));
-        mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout5);
         // set a custom shadow that overlays the main content when the drawer opens
 
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());*/
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
-        ) ;
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-
     }
 
 
@@ -148,8 +141,8 @@ public class NochartActivity extends Activity {
     protected void onPause() {
 
         super.onPause();
-        if(avgThread!=null)
-            avgThread.interrupt();
+        /*if(avgThread!=null)
+            avgThread.interrupt();*/
     }
 
     Shimmer shimmer;
@@ -161,7 +154,7 @@ public class NochartActivity extends Activity {
         yText = (TextView) findViewById(R.id.yAxis);
         zText = (TextView) findViewById(R.id.zAxis);
         sumText = (TextView) findViewById(R.id.sum);
-        danWei = (TextView) findViewById(R.id.danWei);
+        //danWei = (TextView) findViewById(R.id.danWei);
         title = (ShimmerTextView) findViewById(R.id.title);
         //fullScreen = (FButton) findViewById(R.id.bigImg);
         shimmer = new Shimmer();
@@ -179,9 +172,9 @@ public class NochartActivity extends Activity {
                 xText.setText(event.values[0]+"");
                 yText.setText(event.values[1]+"");
                 zText.setText(event.values[2]+"");
-                double sum = threeDimenToOne(event.values[0], event.values[1], event.values[2]);
+               // double sum = threeDimenToOne(event.values[0], event.values[1], event.values[2]);
 
-                giveAverage(sum);
+               // giveAverage(sum);
                 ax=event.values[0];
                 ay=event.values[1];
                 az=event.values[2];
@@ -221,9 +214,9 @@ public class NochartActivity extends Activity {
     }
 
 
-    public static double threeDimenToOne(double x,double y,double z){
+   /* public static double threeDimenToOne(double x,double y,double z){
         return Math.sqrt(x*x+y*y+z*z);
-    }
+    }*/
     public  int index = 0;
     double[] buffer = new double[500];
     double[] diff=new double[501];
@@ -232,27 +225,41 @@ public class NochartActivity extends Activity {
 
 
 
-    public void giveAverage(double data){
+    /*public void giveAverage(double data){
         buffer[index]=data;
         index++;
-    }
+    }*/
 
 
-    private void AddData(double ax2, double ay2, double az2){
-        a_norm= Math.sqrt(ax2*ax2+ay2*ay2+az2*az2);
-        for(i=0;i<=500-2;i++){
-            win[i]=win[i+1];
-        }
-        win[500-1]=a_norm;
+    private void AddData(final double ax2,final double ay2,final double az2){
+        TimerTask task = new TimerTask(){
+
+            public void run(){
+                a_norm= Math.sqrt(ax2*ax2+ay2*ay2+az2*az2);
+                for(i=0;i<=500-2;i++){
+                    win[i]=win[i+1];
+                }
+                win[500-1]=a_norm;//execute the task
+
+            }
+
+        };
+
+        Timer timer = new Timer();
+
+        timer.schedule(task,100);
     }
     private void intialize(){
         for(int i=0;i<501;i++)
             diff[i]=0;
+        for(int i=0;i<499;i++)
+            win[i]=0;
     }
     private void Fall(double[] window2) {
         int tmax = 1;
         int tmin = 1;
         int i = 1;
+        double cha=0;
         diff[1] = window2[0];
         for (i = 2; i < 500; i++) {
             diff[i] = window2[i - 1] - window2[i - 2];
@@ -265,15 +272,19 @@ public class NochartActivity extends Activity {
             if (min > diff[i])
                 tmin = i;
         }
-        double cha = window2[tmax - 1] - window2[tmin - 1];
+        cha = window2[tmax - 1] - window2[tmin - 1];
         if ((cha < 2 * 9.8) || tmax < tmin) {
             tmin = 0;
             tmax = 0;
         } else if (cha > 2 * 9.8) {
-
             sumText.setText("FALL!");
-            Intent it=new Intent(NochartActivity.this,TestActivity.class);
+            sensorManager.unregisterListener(threeParamListener);
+           // avgThread.interrupt();
+            this.finish();
+            Intent it=new Intent(NochartActivity.this,AlertActivity.class);
             startActivity(it);
+
+
         }
     }
 
@@ -282,27 +293,17 @@ public class NochartActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Intent it=new Intent(this,MainActivity.class);
+                startActivity(it);
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
-
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
 
     public View.OnClickListener ButtonListener = new View.OnClickListener(){
 

@@ -24,10 +24,15 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class AlertActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener{
     //private CountDownTimer time;
     SQLiteDatabase db;
+    Cursor c;
     static final String db_name="Fall";
     static final String tb_name="detail";
     private TextView txv;
@@ -46,6 +51,8 @@ public class AlertActivity extends Activity
     //Explicitly get the permission of using location
     private static final int REQUEST_ACCESS_FINE_LOCATION = 605;
     private static final String TAG = MainActivity.class.getSimpleName();
+    Timer time=new Timer();
+    private int len=11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +62,7 @@ public class AlertActivity extends Activity
         yes=(ImageButton)findViewById(R.id.yes);
         no=(ImageButton)findViewById(R.id.no);
         db=openOrCreateDatabase(db_name, Context.MODE_PRIVATE,null);
-        Cursor c=db.rawQuery("SELECT * FROM "+tb_name,null);
+        c=db.rawQuery("SELECT * FROM "+tb_name,null);
         if(c.moveToFirst()){
             name=c.getString(0);
             contact=c.getString(1);
@@ -70,37 +77,44 @@ public class AlertActivity extends Activity
         getCurrentLocation();
         yes.setOnClickListener(listener1);
         no.setOnClickListener(listener2);
+        time.schedule(task,1000,1000);
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
         vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1
         createWakeLocks();
         wakeDevice();
-       // time.start();
     }
-    CountDownTimer time = new CountDownTimer(10000,1000) {
+
+    TimerTask task=new TimerTask() {
         @Override
-        public void onTick(long millisUntilFinished) {
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    len--;
+                    txv.setText(""+len);
+                    if(len==0){
+                        time.cancel();
+                        vibrator.cancel();
+                        db.close();
+                        c.close();
+                        Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();
+                        String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
+                        String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
+                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+                        smsManager.sendTextMessage(phone, null, text_Message, null, null);
+                        finish();
+                        Intent it=new Intent(AlertActivity.this,MainActivity.class);
+                        startActivity(it);
+                        task.cancel();
 
-            txv.setText(""+millisUntilFinished / 1000);
-
-        }
-
-        @Override
-        public void onFinish() {
-           vibrator.cancel();
-            /* time.cancel();
-            String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
-            String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
-            //SmsManager smsManager = SmsManager.getDefault();
-            //smsManager.sendTextMessage(phone, null, text_Message2, null, null);
-            //smsManager.sendTextMessage(phone, null, text_Message, null, null);
-            vibrator.cancel();
-            Intent it=new Intent(AlertActivity.this,MainActivity.class);
-            startActivity(it);
-            AlertActivity.this.finish();
-            Toast.makeText(AlertActivity.this,"Alert Sended!",Toast.LENGTH_SHORT).show();*/
+                    }
+                }
+            });
         }
     };
+
     protected void createWakeLocks(){
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         fullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "Loneworker - FULL WAKE LOCK");
@@ -133,10 +147,10 @@ public class AlertActivity extends Activity
         KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
         keyguardLock.disableKeyguard();
     }
-
     public View.OnClickListener listener1=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            c.close();
             db.close();
             time.cancel();
             vibrator.cancel();
@@ -150,14 +164,15 @@ public class AlertActivity extends Activity
     public View.OnClickListener listener2=new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            c.close();
             db.close();
             time.cancel();
+            vibrator.cancel();
             //String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
             //String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
-           // SmsManager smsManager = SmsManager.getDefault();
-            //smsManager.sendTextMessage(phone, null, text_Message2, null, null);
-            //smsManager.sendTextMessage(phone, null, text_Message, null, null);
-            vibrator.cancel();
+            //SmsManager smsManager = SmsManager.getDefault();
+           // smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+           // smsManager.sendTextMessage(phone, null, text_Message, null, null);
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
             finish();
