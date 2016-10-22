@@ -30,13 +30,6 @@ public class SettingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         db=openOrCreateDatabase(db_name,Context.MODE_PRIVATE,null);
-        String createTable = "CREATE TABLE IF NOT EXISTS " +
-                tb_name + "(name VARCHAR(32), " +
-                "contact VARCHAR(32), " +
-                "phone VARCHAR(16), " +
-                "latitude VARCHAR(16), " +
-                "longitude VARCHAR(16))";
-        db.execSQL(createTable);
         mEditText=(EditText)findViewById(R.id.editText);
         mEditText2=(EditText)findViewById(R.id.editText2);
         mEditText3=(EditText)findViewById(R.id.editText3);

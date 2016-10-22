@@ -2,8 +2,12 @@ package application.cepheus.falldetector;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQuery;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -39,6 +43,12 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    //SQLite
+    Cursor cursor;
+    SQLiteDatabase db;
+    static final String db_name="Fall";
+    static final String tb_name="detail";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +64,15 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
         dialog.setMessage("Loading...");
         dialog.show();
         service.refreshWeather("Sydney,Australia");
+        //SQLite
+        db=openOrCreateDatabase(db_name, Context.MODE_PRIVATE,null);
+        String createTable = "CREATE TABLE IF NOT EXISTS " +
+                tb_name + "(name VARCHAR(32), " +
+                "contact VARCHAR(32), " +
+                "phone VARCHAR(16), " +
+                "latitude VARCHAR(16), " +
+                "longitude VARCHAR(16))";
+        db.execSQL(createTable);
 
         //mTitle="Fall Detector";
         mPlanetTitles=getResources().getStringArray(R.array.p_array);
@@ -90,10 +109,19 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
 
     }
     public void gotoSensorActivity(View v){
-        //Intent it= new Intent(this,AccelActivity.class);
-        Intent it=new Intent(this,AccelActivity.class);
-        startActivity(it);
-        finish();
+        cursor=db.rawQuery("SELECT * FROM "+tb_name,null);
+        int name = cursor.getCount();
+        if(name==0)
+        {
+            Toast.makeText(MainActivity.this,"Please enter the contacter first!",Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //Intent it= new Intent(this,AccelActivity.class);
+            Intent it = new Intent(this, AccelActivity.class);
+            startActivity(it);
+            finish();
+            db.close();
+        }
     }
 
     //YahooWeather Service
