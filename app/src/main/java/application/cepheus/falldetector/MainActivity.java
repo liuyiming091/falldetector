@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
 
         service = new  YahooWeatherService(this);
         dialog = new ProgressDialog(this);
-        dialog.setMessage("Loading...");
+        //dialog.setMessage("Loading...");
         //dialog.show();
         service.refreshWeather("Sydney,Australia");
         //SQLite
@@ -108,22 +108,7 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
     }
-    public void gotoSensorActivity(View v){
-        cursor=db.rawQuery("SELECT * FROM "+tb_name,null);
-        int name = cursor.getCount();
-        if(name==0)
-        {
-            Toast.makeText(MainActivity.this,"Please enter the contacter first!",Toast.LENGTH_SHORT).show();
-        }
-        else {
-            //Intent it= new Intent(this,AccelActivity.class);
-            finish();
-            Intent it = new Intent(this, AccelActivity.class);
-            startActivity(it);
 
-            db.close();
-        }
-    }
     public void on1(View v){
         cursor=db.rawQuery("SELECT * FROM "+tb_name,null);
         int name = cursor.getCount();

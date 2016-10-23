@@ -60,17 +60,13 @@ public class AccelActivity extends Activity {
 	Handler avgHandler;
 	Thread avgThread;
 	int sensor_id = 0;
+	//algorithm related
 	public double ax,ay,az;
 	public double a_norm;
 	public  int i=0;
 	static int BUFF_SIZE=500;
 	static public double[] win= new double[BUFF_SIZE];
-	private String[] mPlanetTitles;
-	private CharSequence mTitle;
-	private CharSequence mDrawerTitle;
-	private ListView mDrawerList;
-	private DrawerLayout mDrawerLayout;
-	private ActionBarDrawerToggle mDrawerToggle;
+
 
 	//graph related
 	 private XYSeries series;
@@ -92,11 +88,11 @@ public class AccelActivity extends Activity {
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		avgHandler = new AveHandler();
 		db = DbUtils.create(getApplicationContext());
-        intialize();
+        initialize();
 		if(xText==null){
 			findViews();
 		}
-        //sumText.setText("normal ");
+
 		Intent intent = getIntent();
 		int wtd = intent.getIntExtra("wtd", Sensor.TYPE_ACCELEROMETER);
 
@@ -121,30 +117,21 @@ public class AccelActivity extends Activity {
 
         //initialize chart
         initChart("Times", danWei.getText().toString(),0,xMax,yMin,yMax);
-		/*mTitle="Fall Detector";
-		mPlanetTitles=getResources().getStringArray(R.array.p_array);
-		mDrawerList=(ListView) findViewById(R.id.left_drawer);
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.drawer_list_item, mPlanetTitles));*/
+		//set ActionBar
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
 
 	}
 
-    private void intialize(){
+	//initialize the array
+    private void initialize(){
         for(int i=1;i<500;i++)
             diff[i]=0;
         for(int i=0;i<500;i++)
             win[i]=0;
     }
 
-    @Override
-	protected void onPause() {
 
-		super.onPause();
-		if(avgThread!=null)
-		avgThread.interrupt();
-	}
 	
 	Shimmer shimmer;
 
@@ -170,7 +157,7 @@ public class AccelActivity extends Activity {
 				
 				@Override
 				public void onSensorChanged(SensorEvent event) {
-
+					//get the sensor value
 					xText.setText(event.values[0]+""); 
 					yText.setText(event.values[1]+""); 
 					zText.setText(event.values[2]+""); 
@@ -179,22 +166,6 @@ public class AccelActivity extends Activity {
 					ax=event.values[0];
 					ay=event.values[1];
 					az=event.values[2];
-                    sumText.setText("initiating...");
-
-                    /*new Thread(){
-                        public void run(){
-                            try {
-                                sleep(3000);
-                            } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            finally{
-                                AddData(ax,ay,az);
-                                Fall(win);//fall detector
-                            }
-                        }
-                    }.start();*/
 					AddData(ax,ay,az);
 					Fall(win);//fall detector
 				}
@@ -233,24 +204,7 @@ public class AccelActivity extends Activity {
         layout.addView(chart, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 	}
 	
-	@Override
-	protected void onDestroy() {
 
-		super.onDestroy();
-		if(threeParamListener!=null){
-			sensorManager.unregisterListener(threeParamListener);
-		}
-		if(oneParamListener!=null){
-			sensorManager.unregisterListener(oneParamListener);
-		}
-		if(twoParamListener!=null){
-			sensorManager.unregisterListener(twoParamListener);
-		}
-		if(avgThread!=null)
-		avgThread.interrupt();
-
-		
-	}
 	
 
 	public static double threeDimenToOne(double x,double y,double z){
@@ -307,14 +261,6 @@ public class AccelActivity extends Activity {
 
 			updateChart();
 
-			/*Accelerate_info accelerate_info = new Accelerate_info(System.currentTimeMillis(), AVERAGE, sensor_id);
-			try {
-				db.save(accelerate_info);
-			} catch (DbException e) {
-
-				e.printStackTrace();
-				System.out.println("fail");
-			}*/
 		}
 	}
 
@@ -484,6 +430,31 @@ public class AccelActivity extends Activity {
 			finish();
 		}
 	};
+
+	@Override
+	protected void onDestroy() {
+
+		super.onDestroy();
+		if(threeParamListener!=null){
+			sensorManager.unregisterListener(threeParamListener);
+		}
+		if(oneParamListener!=null){
+			sensorManager.unregisterListener(oneParamListener);
+		}
+		if(twoParamListener!=null){
+			sensorManager.unregisterListener(twoParamListener);
+		}
+		if(avgThread!=null)
+			avgThread.interrupt();
+	}
+
+	@Override
+	protected void onPause() {
+
+		super.onPause();
+		if(avgThread!=null)
+			avgThread.interrupt();
+	}
 
 
 

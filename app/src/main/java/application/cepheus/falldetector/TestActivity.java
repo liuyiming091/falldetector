@@ -15,9 +15,6 @@ public class TestActivity extends Activity {
     static final String db_name="Fall";
     static final String tb_name="detail";
     TextView txv,txv2,txv3;
-    PowerManager.WakeLock fullWakeLock;
-    PowerManager.WakeLock partialWakeLock;
-    private Vibrator vibrator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

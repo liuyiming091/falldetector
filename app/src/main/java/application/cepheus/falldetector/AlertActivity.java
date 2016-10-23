@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
@@ -80,8 +79,8 @@ public class AlertActivity extends Activity
         no.setOnClickListener(listener2);
         time.schedule(task,1000,1000);
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
-        long [] pattern = {100,400,100,400};   // 停止 开启 停止 开启
-        vibrator.vibrate(pattern,2);           //重复两次上面的pattern 如果只想震动一次，index设为-1
+        long [] pattern = {100,400,100,400};   // stop vibe stop vibe
+        vibrator.vibrate(pattern,2);           //repeat twice
         createWakeLocks();
         wakeDevice();
     }

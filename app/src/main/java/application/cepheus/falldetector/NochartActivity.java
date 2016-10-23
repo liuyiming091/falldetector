@@ -54,10 +54,8 @@ public class NochartActivity extends Activity {
     TextView yText ;
     TextView zText ;
     TextView sumText;
-    TextView danWei ;
     ShimmerTextView title;
     private ImageButton button;
-    private Vibrator vibrator;
 
     SensorEventListener threeParamListener;
     SensorEventListener oneParamListener;
@@ -70,23 +68,13 @@ public class NochartActivity extends Activity {
     public  int i=0;
     static int BUFF_SIZE=500;
     static public double[] win= new double[BUFF_SIZE];
-    private String[] mPlanetTitles;
+    /*private String[] mPlanetTitles;
     private CharSequence mTitle;
     private CharSequence mDrawerTitle;
     private ListView mDrawerList;
     private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
+    private ActionBarDrawerToggle mDrawerToggle;*/
 
-    //图表相关
-    private XYSeries series;
-    private XYMultipleSeriesDataset mDataset;
-    private GraphicalView chart;
-    private XYMultipleSeriesRenderer renderer;
-    private Context context;
-    private int yMax = 20;
-    private int xMax = 50;
-    private int yMin = 0;
-    DbUtils db ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +83,7 @@ public class NochartActivity extends Activity {
         button=(ImageButton)findViewById(R.id.quit2);
         button.setOnClickListener(ButtonListener);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        db = DbUtils.create(getApplicationContext());
-        //给控件实例化
+
         if(xText==null){
             findViews();
         }
@@ -105,7 +92,6 @@ public class NochartActivity extends Activity {
         intialize();
 
 
-        //初始化各个监听器
         initListeners();
 
         switch (wtd) {
@@ -114,14 +100,13 @@ public class NochartActivity extends Activity {
                 //danWei.setText("");
                 accelSensor = sensorManager.getDefaultSensor(wtd);
                 sensorManager.registerListener(threeParamListener, accelSensor, sensorManager.SENSOR_DELAY_UI);
-                yMax = 20;
                 sensor_id = wtd;
                 break;
             default:
                 break;
         }
 
-        mTitle="Fall Detector";
+       /* mTitle="Fall Detector";
         mPlanetTitles=getResources().getStringArray(R.array.p_array);
         mDrawerList=(ListView) findViewById(R.id.left_drawer5);
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
@@ -129,7 +114,7 @@ public class NochartActivity extends Activity {
         mDrawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout5);
         // set a custom shadow that overlays the main content when the drawer opens
 
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);*/
         //mDrawerList.setOnItemClickListener(new DrawerItemClickListener());*/
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
@@ -141,8 +126,6 @@ public class NochartActivity extends Activity {
     protected void onPause() {
 
         super.onPause();
-        /*if(avgThread!=null)
-            avgThread.interrupt();*/
     }
 
     Shimmer shimmer;
