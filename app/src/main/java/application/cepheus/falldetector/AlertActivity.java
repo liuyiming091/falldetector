@@ -40,6 +40,7 @@ public class AlertActivity extends Activity
     PowerManager.WakeLock fullWakeLock;
     PowerManager.WakeLock partialWakeLock;
     private Vibrator vibrator;
+
     String name,contact,phone;
     //location
     private Location mLastLocation;
@@ -168,11 +169,11 @@ public class AlertActivity extends Activity
             db.close();
             time.cancel();
             vibrator.cancel();
-            //String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
-            //String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
-            //SmsManager smsManager = SmsManager.getDefault();
-           // smsManager.sendTextMessage(phone, null, text_Message2, null, null);
-           // smsManager.sendTextMessage(phone, null, text_Message, null, null);
+            String text_Message ="https://maps.google.com/?t=m&q="+currentLatitude+','+currentLongitude+"+(Shared+location)&ll="+currentLatitude+','+currentLongitude+"&z=17";
+            String text_Message2="An emergency might occur to your friend, "+name+", here is the location for him/her right now, please help him/her as soon as possible!";
+            SmsManager smsManager = SmsManager.getDefault();
+           smsManager.sendTextMessage(phone, null, text_Message2, null, null);
+           smsManager.sendTextMessage(phone, null, text_Message, null, null);
             Intent it=new Intent(AlertActivity.this,MainActivity.class);
             startActivity(it);
             finish();
