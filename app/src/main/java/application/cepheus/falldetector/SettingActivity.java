@@ -18,13 +18,12 @@ import android.widget.TextView;
 
 public class SettingActivity extends Activity {
     private EditText mEditText,mEditText2,mEditText3;
-    //private CharSequence mCrime;
     private Button button;
     private SharedPreferences savednotes,savednotes2,savednotes3;
     SQLiteDatabase db;
     static final String db_name="Fall";
     static final String tb_name="detail";
-   // private  static final String TEMP_INFO="temp_info";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

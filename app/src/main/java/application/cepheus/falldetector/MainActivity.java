@@ -117,11 +117,10 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
             Toast.makeText(MainActivity.this,"Please enter the contacter first!",Toast.LENGTH_SHORT).show();
         }
         else {
-            //Intent it= new Intent(this,AccelActivity.class);
             finish();
             Intent it = new Intent(this, AccelActivity.class);
             startActivity(it);
-
+            cursor.close();
             db.close();
         }
     }
@@ -133,10 +132,10 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
             Toast.makeText(MainActivity.this,"Please enter the contacter first!",Toast.LENGTH_SHORT).show();
         }
         else {
-            //Intent it= new Intent(this,AccelActivity.class);
             finish();
             Intent it = new Intent(this, NochartActivity.class);
             startActivity(it);
+            cursor.close();
             db.close();
         }
     }
@@ -191,7 +190,7 @@ public class MainActivity extends Activity implements WeatherServiceCallback{
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    //deal with side menu
+    //deal with actionbar
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
