@@ -46,8 +46,6 @@ public class AccelActivity extends Activity {
 	private ImageButton button;
 
 	SensorEventListener threeParamListener;
-	SensorEventListener oneParamListener;
-	SensorEventListener twoParamListener;
 	Handler avgHandler;
 	Thread avgThread;
 	int sensor_id = 0;
@@ -65,7 +63,6 @@ public class AccelActivity extends Activity {
 	 private XYMultipleSeriesDataset mDataset;
 	 private GraphicalView chart;
 	 private XYMultipleSeriesRenderer renderer;
-	 private Context context;
 	 private int yMax = 20;
 	 private int xMax = 50;
 	 private int yMin = 0;
