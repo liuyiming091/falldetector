@@ -12,22 +12,14 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Vibrator;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.exception.DbException;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
@@ -52,7 +44,6 @@ public class AccelActivity extends Activity {
 	TextView danWei ;
 	ShimmerTextView title;
 	private ImageButton button;
-	//private Vibrator vibrator;
 
 	SensorEventListener threeParamListener;
 	SensorEventListener oneParamListener;
@@ -60,6 +51,7 @@ public class AccelActivity extends Activity {
 	Handler avgHandler;
 	Thread avgThread;
 	int sensor_id = 0;
+
 	//algorithm related
 	public double ax,ay,az;
 	public double a_norm;
@@ -437,12 +429,6 @@ public class AccelActivity extends Activity {
 		super.onDestroy();
 		if(threeParamListener!=null){
 			sensorManager.unregisterListener(threeParamListener);
-		}
-		if(oneParamListener!=null){
-			sensorManager.unregisterListener(oneParamListener);
-		}
-		if(twoParamListener!=null){
-			sensorManager.unregisterListener(twoParamListener);
 		}
 		if(avgThread!=null)
 			avgThread.interrupt();
